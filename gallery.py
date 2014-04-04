@@ -1,3 +1,13 @@
+"""
+Gallery maker for scade2b.
+
+Usage : python gallery.py /path/to/name.test
+
+where name.test is a subdirectory of scade2b tests.
+
+It will output a html gallery to out/gallery.html.
+"""
+
 import os.path
 import re
 import sys
@@ -58,6 +68,10 @@ class BLexer(RegexLexer):
 
 
 def category(s):
+    """
+    Categorize a filename.
+    Returns (category, base).
+    """
     if s.endswith('_i.imp'):
         base = re.sub(r'_i.imp$', '', s)
         return ('Implementation', base)
@@ -65,6 +79,13 @@ def category(s):
         base = re.sub(r'.mch$', '', s)
         return ('Abstract machine', base)
     assert False
+
+
+def highlight_b(s):
+    """
+    Highlight a string of B code
+    """
+    return highlight(s, BLexer(), HtmlFormatter())
 
 
 class Example(object):
@@ -95,18 +116,18 @@ class Example(object):
         tpl = Template(filename=tpl_file, default_filters=['h'])
         scade_pyg = highlight(self.scade, ScadeLexer(), HtmlFormatter())
         xml_pyg = highlight(self.xml, XmlLexer(), HtmlFormatter())
-        def hl_b(s):
-            return highlight(s, BLexer(), HtmlFormatter())
-        b_pyg = {fn: {k: hl_b(v) for k, v in bfile.items()} for fn, bfile in self.b.items()}
-        #b_pyg = {}
-        #for fn, d in self.b.items():
-            #print d
-            #b_pyg[d] = {'.mch': hl_b(d['.mch'])}
+        b_pyg = {fn:
+                 {k: highlight_b(v) for k, v in bfile.items()
+                  } for fn, bfile in self.b.items()
+                 }
         out = tpl.render(scade=scade_pyg, xml=xml_pyg, b=b_pyg)
         return out.encode('utf8')
 
 
 def main():
+    if len(sys.argv) <= 1:
+        print __doc__
+        sys.exit(1)
     test_path = sys.argv[1]
     e = Example.from_test(test_path)
     if not os.path.isdir('out'):
