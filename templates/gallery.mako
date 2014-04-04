@@ -5,14 +5,20 @@
 </head>
 <body>
 <div class="container">
-<h3>Scade</h3>
+<h2>Scade</h2>
 ${scade|n}
-<h3>XML</h3>
+<h2>XML</h2>
 ${xml|n}
-<h3>B</h3>
+<h2>B</h2>
+% for name, bfile in b.items():
+<h3>${name}</h3>
+% for k, v in bfile.items():
+<h4>${k}</h4>
 <pre>
-${b}
+${v}
 </pre>
+% endfor
+% endfor
 </div>
 </body>
 </html>

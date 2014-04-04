@@ -42,7 +42,14 @@ class Example(object):
             scade = f.read()
         with open(os.path.join(path, 'KCG/kcg_trace.xml')) as f:
             xml = f.read()
-        b = "B"
+        b = {}
+        for fn in os.listdir(os.path.join(path, 'spec')):
+            (base, ext) = os.path.splitext(fn)
+            with open(os.path.join(path, 'spec', fn)) as f:
+                content = f.read()
+            if base not in b:
+                b[base] = {}
+            b[base][ext] = content
         return Example(scade, xml, b)
 
     def render(self):
