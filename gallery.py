@@ -1,4 +1,5 @@
 import os.path
+import re
 import sys
 from mako.template import Template
 from pygments import highlight
@@ -56,6 +57,16 @@ class BLexer(RegexLexer):
     }
 
 
+def category(s):
+    if s.endswith('_i.imp'):
+        base = re.sub(r'_i.imp$', '', s)
+        return ('Implementation', base)
+    if s.endswith('.mch'):
+        base = re.sub(r'.mch$', '', s)
+        return ('Abstract machine', base)
+    assert False
+
+
 class Example(object):
 
     def __init__(self, scade, xml, b):
@@ -71,12 +82,12 @@ class Example(object):
             xml = f.read()
         b = {}
         for fn in os.listdir(os.path.join(path, 'spec')):
-            (base, ext) = os.path.splitext(fn)
+            (cat, base) = category(fn)
             with open(os.path.join(path, 'spec', fn)) as f:
                 content = f.read()
             if base not in b:
                 b[base] = {}
-            b[base][ext] = content
+            b[base][cat] = content
         return Example(scade, xml, b)
 
     def render(self):

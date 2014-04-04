@@ -12,7 +12,7 @@ ${xml|n}
 <h2>B</h2>
 % for name, bfile in b.items():
 <h3>${name}</h3>
-% for k, v in bfile.items():
+% for k, v in sorted(bfile.items(), key=lambda t: t[0]):
 <h4>${k}</h4>
 ${v|n}
 % endfor
