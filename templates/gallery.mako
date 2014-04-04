@@ -1,6 +1,7 @@
 <html>
 <head>
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="pygments.css">
 </head>
 <body>
 <div class="container">
@@ -9,9 +10,7 @@
 ${scade}
 </pre>
 <h3>XML</h3>
-<pre>
-${xml}
-</pre>
+${xml|n}
 <h3>B</h3>
 <pre>
 ${b}

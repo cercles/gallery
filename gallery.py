@@ -1,6 +1,9 @@
 import os.path
 import sys
 from mako.template import Template
+from pygments import highlight
+from pygments.lexers import XmlLexer
+from pygments.formatters import HtmlFormatter
 
 
 class Example(object):
@@ -22,14 +25,20 @@ class Example(object):
     def render(self):
         tpl_file = 'templates/gallery.mako'
         tpl = Template(filename=tpl_file, default_filters=['h'])
-        out = tpl.render(scade=self.scade, xml=self.xml, b=self.b)
+        xml_pyg = highlight(self.xml, XmlLexer(), HtmlFormatter())
+        out = tpl.render(scade=self.scade, xml=xml_pyg, b=self.b)
         return out.encode('utf8')
 
 
 def main():
     test_path = sys.argv[1]
     e = Example.from_test(test_path)
-    print e.render()
+    if not os.path.isdir('out'):
+        os.mkdir('out')
+    with open('out/gallery.html', 'w') as f:
+        f.write(e.render())
+    with open('out/pygments.css', 'w') as f:
+        f.write(HtmlFormatter().get_style_defs())
 
 if __name__ == '__main__':
     main()
