@@ -2,8 +2,31 @@ import os.path
 import sys
 from mako.template import Template
 from pygments import highlight
+from pygments.lexer import RegexLexer
 from pygments.lexers import XmlLexer
 from pygments.formatters import HtmlFormatter
+from pygments.token import *
+
+
+class ScadeLexer(RegexLexer):
+    name = 'Scade'
+    aliases = ['scade']
+    filenames = ['*.scade']
+
+    tokens = {
+        'root': [
+            (r'function', Keyword),
+            (r'tel', Keyword),
+            (r'let', Keyword),
+            (r'returns', Keyword),
+            (r'[();\[\]]', Punctuation),
+            (r'[@,:^=]', Operator),
+            (r'\.\.', Operator),
+            (r'\d+(\.\d+)?', Number),
+            (r'\w+', Text),
+            (r'\s+', Text),
+        ]
+    }
 
 
 class Example(object):
@@ -25,8 +48,9 @@ class Example(object):
     def render(self):
         tpl_file = 'templates/gallery.mako'
         tpl = Template(filename=tpl_file, default_filters=['h'])
+        scade_pyg = highlight(self.scade, ScadeLexer(), HtmlFormatter())
         xml_pyg = highlight(self.xml, XmlLexer(), HtmlFormatter())
-        out = tpl.render(scade=self.scade, xml=xml_pyg, b=self.b)
+        out = tpl.render(scade=scade_pyg, xml=xml_pyg, b=self.b)
         return out.encode('utf8')
 
 

@@ -6,9 +6,7 @@
 <body>
 <div class="container">
 <h3>Scade</h3>
-<pre>
-${scade}
-</pre>
+${scade|n}
 <h3>XML</h3>
 ${xml|n}
 <h3>B</h3>
