@@ -11,6 +11,7 @@ It will output a html gallery to out/gallery.html.
 import os.path
 import re
 import sys
+from mako.lookup import TemplateLookup
 from mako.template import Template
 from pygments import highlight
 from pygments.lexer import RegexLexer
@@ -112,8 +113,8 @@ class Example(object):
         return Example(scade, xml, b)
 
     def render(self):
-        tpl_file = 'templates/gallery.mako'
-        tpl = Template(filename=tpl_file, default_filters=['h'])
+        lookup = TemplateLookup(directories=['templates'], default_filters=['h'])
+        tpl = lookup.get_template('gallery.mako')
         scade_pyg = highlight(self.scade, ScadeLexer(), HtmlFormatter())
         xml_pyg = highlight(self.xml, XmlLexer(), HtmlFormatter())
         b_pyg = {fn:
