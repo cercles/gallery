@@ -23,7 +23,7 @@ class ScadeLexer(RegexLexer):
             (r'[@,:^=]', Operator),
             (r'\.\.', Operator),
             (r'\d+(\.\d+)?', Number),
-            (r'\w+', Text),
+            (r'\w+', Name),
             (r'\s+', Text),
         ]
     }
