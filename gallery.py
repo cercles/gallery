@@ -29,6 +29,33 @@ class ScadeLexer(RegexLexer):
     }
 
 
+class BLexer(RegexLexer):
+    name = 'B'
+    aliases = ['b']
+    filenames = ['*.mch', '*.imp']
+
+    tokens = {
+        'root': [
+            (r'MACHINE|IMPLEMENTATION|REFINES|SEES|OPERATIONS|END', Keyword),
+            (r'seq', Keyword),
+            (r'BOOL', Keyword),
+            (r'<--', Operator),
+            (r':=', Operator),
+            (r'\|-\>', Operator),
+            (r'/\|\\', Operator),
+            (r'\\\|/', Operator),
+            (r'=', Operator),
+            (r'\+', Operator),
+            (r'::?', Operator),
+            (r'\^', Operator),
+            (r'\d+(\.\d+)?', Number),
+            (r'[(){}\|,&]', Punctuation),
+            (r'\w+', Name),
+            (r'\s+', Text),
+        ]
+    }
+
+
 class Example(object):
 
     def __init__(self, scade, xml, b):
@@ -57,7 +84,14 @@ class Example(object):
         tpl = Template(filename=tpl_file, default_filters=['h'])
         scade_pyg = highlight(self.scade, ScadeLexer(), HtmlFormatter())
         xml_pyg = highlight(self.xml, XmlLexer(), HtmlFormatter())
-        out = tpl.render(scade=scade_pyg, xml=xml_pyg, b=self.b)
+        def hl_b(s):
+            return highlight(s, BLexer(), HtmlFormatter())
+        b_pyg = {fn: {k: hl_b(v) for k, v in bfile.items()} for fn, bfile in self.b.items()}
+        #b_pyg = {}
+        #for fn, d in self.b.items():
+            #print d
+            #b_pyg[d] = {'.mch': hl_b(d['.mch'])}
+        out = tpl.render(scade=scade_pyg, xml=xml_pyg, b=b_pyg)
         return out.encode('utf8')
 
 

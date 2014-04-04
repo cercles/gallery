@@ -14,9 +14,7 @@ ${xml|n}
 <h3>${name}</h3>
 % for k, v in bfile.items():
 <h4>${k}</h4>
-<pre>
-${v}
-</pre>
+${v|n}
 % endfor
 % endfor
 </div>
