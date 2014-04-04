@@ -114,7 +114,7 @@ def main():
     with open('out/gallery.html', 'w') as f:
         f.write(e.render())
     with open('out/pygments.css', 'w') as f:
-        f.write(HtmlFormatter().get_style_defs())
+        f.write(HtmlFormatter(style='murphy').get_style_defs())
 
 if __name__ == '__main__':
     main()
