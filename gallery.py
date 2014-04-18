@@ -137,7 +137,7 @@ class Example(object):
                     }
 
         lookup = TemplateLookup(directories=['templates'], default_filters=['h'])
-        tpl = lookup.get_template('gallery.mako')
+        tpl = lookup.get_template('web.mako')
         out = tpl.render(exs=[pyg_ex(e) for e in l])
         return out.encode('utf8')
 
