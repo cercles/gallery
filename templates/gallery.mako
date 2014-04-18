@@ -9,7 +9,7 @@
 <div class="col-md-2">
 <ul class="nav" style="position: fixed">
 % for ex in exs:
-<li><a href="#">${ex['name']}</a>
+<li><a href="#${ex['name']}">${ex['name']}</a>
 <ul>
 <li><a href="#${ex['name']}-scade">Scade</a></li>
 <li><a href="#${ex['name']}-xml">XML</a></li>
@@ -21,9 +21,10 @@
 </div>
 <div class="col-md-10">
 % for ex in exs:
-<h1 name="${ex['name']}">${ex['name']}</h1>
+<a href="#" name="${ex['name']}"></a>
+<h1>${ex['name']}</h1>
 <a href="#" name="${ex['name']}-scade"></a>
-<h2 name="scade">Scade</h2>
+<h2>Scade</h2>
 ${ex['scade']|n}
 <a href="#" name="${ex['name']}-xml"></a>
 <h2>XML</h2>
