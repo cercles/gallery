@@ -28,8 +28,10 @@ class ScadeLexer(RegexLexer):
     tokens = {
         'root': [
             (r'function', Keyword),
+            (r'node', Keyword),
             (r'tel', Keyword),
             (r'let', Keyword),
+            (r'var', Keyword),
             (r'returns', Keyword),
             (r'[();\[\]]', Punctuation),
             (r'[@,:^]', Operator),
@@ -51,9 +53,9 @@ class BLexer(RegexLexer):
 
     tokens = {
         'root': [
-            (r'MACHINE|IMPLEMENTATION|REFINES|SEES|OPERATIONS|END', Keyword),
+            (r'MACHINE|IMPLEMENTATION|REFINES|SEES|OPERATIONS|PRE|THEN|END', Keyword),
             (r'seq', Keyword),
-            (r'BOOL', Keyword),
+            (r'BOOL|INT', Keyword),
             (r'<--', Operator),
             (r':=', Operator),
             (r'\|-\>', Operator),
