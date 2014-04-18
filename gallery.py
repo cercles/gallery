@@ -8,6 +8,7 @@ where name.test is a subdirectory of scade2b tests.
 It will output a html gallery to out/gallery.html.
 """
 
+import collections
 import os.path
 import re
 import sys
@@ -94,66 +95,51 @@ def highlight_b(s):
     return highlight(s, BLexer(), HtmlFormatter())
 
 
-class Example(object):
+Example = collections.namedtuple('Example', 'name scade xml b')
 
-    def __init__(self, name, scade, xml, b):
-        self.name = name
-        self.scade = scade
-        self.xml = xml
-        self.b = b
-
-    @staticmethod
-    def from_test(path):
-        g = re.search(r'/(\w+)\.test', path)
-        name = g.group(1)
-        with open(os.path.join(path, 'KCG/kcg_xml_filter_out.scade')) as f:
-            scade = f.read()
-        with open(os.path.join(path, 'KCG/kcg_trace.xml')) as f:
-            xml = f.read()
-        b = {}
-        for fn in os.listdir(os.path.join(path, 'spec')):
-            (cat, base) = category(fn)
-            with open(os.path.join(path, 'spec', fn)) as f:
-                content = f.read()
-            if base not in b:
-                b[base] = {}
-            b[base][cat] = content
-        return Example(name, scade, xml, b)
-
-    @staticmethod
-    def render_list(l):
-
-        def pyg_ex(e):
-            scade_pyg = highlight(e.scade, ScadeLexer(), HtmlFormatter())
-            xml_pyg = highlight(e.xml, XmlLexer(), HtmlFormatter())
-            b_pyg = {fn:
-                     {k: highlight_b(v) for k, v in bfile.items()
-                      } for fn, bfile in e.b.items()
-                     }
-            return {'scade': scade_pyg,
-                    'xml': xml_pyg,
-                    'b': b_pyg,
-                    'name': e.name,
-                    }
-
-        lookup = TemplateLookup(directories=['templates'], default_filters=['h'])
-        tpl = lookup.get_template('web.mako')
-        out = tpl.render(exs=[pyg_ex(e) for e in l])
-        return out.encode('utf8')
+def ex_from_test(path):
+    g = re.search(r'/(\w+)\.test', path)
+    name = g.group(1)
+    with open(os.path.join(path, 'KCG/kcg_xml_filter_out.scade')) as f:
+        scade = f.read()
+    with open(os.path.join(path, 'KCG/kcg_trace.xml')) as f:
+        xml = f.read()
+    b = {}
+    for fn in os.listdir(os.path.join(path, 'spec')):
+        (cat, base) = category(fn)
+        with open(os.path.join(path, 'spec', fn)) as f:
+            content = f.read()
+        if base not in b:
+            b[base] = {}
+        b[base][cat] = content
+    return Example(name, scade, xml, b)
 
 
+def pyg_ex(e):
+    scade_pyg = highlight(e.scade, ScadeLexer(), HtmlFormatter())
+    xml_pyg = highlight(e.xml, XmlLexer(), HtmlFormatter())
+    b_pyg = {fn:
+             {k: highlight_b(v) for k, v in bfile.items()
+              } for fn, bfile in e.b.items()
+             }
+    return Example(e.name, scade_pyg, xml_pyg, b_pyg)
 
+def render_list(l):
+    lookup = TemplateLookup(directories=['templates'], default_filters=['h'])
+    tpl = lookup.get_template('web.mako')
+    out = tpl.render(exs=[pyg_ex(e) for e in l])
+    return out.encode('utf8')
 
 def main():
     if len(sys.argv) <= 1:
         print __doc__
         sys.exit(1)
     test_paths = sys.argv[1:]
-    l_ex = [Example.from_test(tp) for tp in test_paths]
+    l_ex = [ex_from_test(tp) for tp in test_paths]
     if not os.path.isdir('out'):
         os.mkdir('out')
     with open('out/gallery.html', 'w') as f:
-        f.write(Example.render_list(l_ex))
+        f.write(render_list(l_ex))
     with open('out/pygments.css', 'w') as f:
         f.write(HtmlFormatter(style='murphy').get_style_defs())
 
