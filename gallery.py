@@ -145,11 +145,8 @@ def main():
     ext = {'html': 'html',
            'latex': 'tex',
            }[fmt]
-    tpl = {'html': 'web.mako',
-           'latex': 'latex.mako',
-           }[fmt]
     with open('out/gallery.%s' % ext, 'w') as f:
-        f.write(render_list(l_ex, tpl, formatcls()))
+        f.write(render_list(l_ex, fmt+'.mako', formatcls()))
     with open('out/%s' % style_file, 'w') as f:
         f.write(formatcls(style='murphy').get_style_defs())
 
