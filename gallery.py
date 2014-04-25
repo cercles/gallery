@@ -1,13 +1,13 @@
 """
 Gallery maker for scade2b.
 
-Usage : python gallery.py /path/to/name.test ...
+Usage:
+    gallery.py <testdir>...
 
-where name.test is a subdirectory of scade2b tests.
-
-It will output a html gallery to out/gallery.html.
+where testdirs are subdirectories of scade2b tests.
 """
 
+import docopt
 import collections
 import os.path
 import re
@@ -131,10 +131,8 @@ def render_list(l):
     return out.encode('utf8')
 
 def main():
-    if len(sys.argv) <= 1:
-        print __doc__
-        sys.exit(1)
-    test_paths = sys.argv[1:]
+    arguments = docopt.docopt(__doc__)
+    test_paths = arguments['<testdir>']
     l_ex = [ex_from_test(tp) for tp in test_paths]
     if not os.path.isdir('out'):
         os.mkdir('out')
