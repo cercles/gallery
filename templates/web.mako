@@ -25,17 +25,17 @@
 <h1>${ex.name}</h1>
 <a href="#" name="${ex.name}-scade"></a>
 <h2>Scade</h2>
-${ex.scade|n}
+${ex.scade}
 <a href="#" name="${ex.name}-xml"></a>
 <h2>XML</h2>
-${ex.xml|n}
+${ex.xml}
 <a href="#" name="${ex.name}-b"></a>
 <h2>B</h2>
 % for name, bfile in ex.b.items():
 <h3>${name}</h3>
 % for k, v in sorted(bfile.items(), key=lambda t: t[0]):
 <h4>${k}</h4>
-${v|n}
+${v}
 % endfor
 % endfor
 % endfor
