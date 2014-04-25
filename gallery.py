@@ -57,7 +57,8 @@ class BLexer(RegexLexer):
 
     tokens = {
         'root': [
-            (r'MACHINE|IMPLEMENTATION|REFINES|SEES|OPERATIONS|PRE|THEN|END', Keyword),
+            (r'MACHINE|IMPLEMENTATION|REFINES', Keyword),
+            (r'SEES|OPERATIONS|PRE|THEN|END', Keyword),
             (r'seq', Keyword),
             (r'BOOL|INT', Keyword),
             (r'<--', Operator),
@@ -92,6 +93,7 @@ def category(s):
 
 Example = collections.namedtuple('Example', 'name scade xml b')
 
+
 def ex_from_test(path):
     g = re.search(r'/(\w+)\.test', path)
     name = g.group(1)
@@ -119,11 +121,13 @@ def pyg_ex(e, formatter):
              }
     return Example(e.name, scade_pyg, xml_pyg, b_pyg)
 
+
 def render_list(l, template_name, formatter):
     lookup = TemplateLookup(directories=['templates'])
     tpl = lookup.get_template(template_name)
     out = tpl.render(exs=[pyg_ex(e, formatter) for e in l])
     return out.encode('utf8')
+
 
 def main():
     arguments = docopt.docopt(__doc__)
