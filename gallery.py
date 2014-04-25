@@ -134,21 +134,24 @@ def main():
     test_paths = arguments['<testdir>']
     fmt = arguments['--format']
     l_ex = [ex_from_test(tp) for tp in test_paths]
-    if fmt == 'html':
-        if not os.path.isdir('out'):
-            os.mkdir('out')
-        with open('out/gallery.html', 'w') as f:
-            f.write(render_list(l_ex, 'web.mako', HtmlFormatter()))
-        with open('out/pygments.css', 'w') as f:
-            f.write(HtmlFormatter(style='murphy').get_style_defs())
-    elif fmt == 'latex':
-        with open('out/gallery.tex', 'w') as f:
-            f.write(render_list(l_ex, 'latex.mako', LatexFormatter()))
-        with open('out/style.tex', 'w') as f:
-            f.write(LatexFormatter(style='murphy').get_style_defs())
-    else:
-        print "Bad format: %s" % fmt
-        sys.exit(1)
+    if not os.path.isdir('out'):
+        os.mkdir('out')
+    style_file = {'html': 'pygments.css',
+                  'latex': 'style.tex',
+                  }[fmt]
+    formatcls = {'html': HtmlFormatter,
+                 'latex': LatexFormatter,
+                 }[fmt]
+    ext = {'html': 'html',
+           'latex': 'tex',
+           }[fmt]
+    tpl = {'html': 'web.mako',
+           'latex': 'latex.mako',
+           }[fmt]
+    with open('out/gallery.%s' % ext, 'w') as f:
+        f.write(render_list(l_ex, tpl, formatcls()))
+    with open('out/%s' % style_file, 'w') as f:
+        f.write(formatcls(style='murphy').get_style_defs())
 
 if __name__ == '__main__':
     main()
