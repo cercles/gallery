@@ -6,6 +6,7 @@ ${ex.scade}
 \subsubsection{XML}
 
 ${ex.xml}
+% if ex.b:
 \subsubsection{B}
 
 % for name, bfile in ex.b.items():
@@ -15,4 +16,5 @@ ${quote_tex(name)} -- ${k}:
 ${v}
 % endfor
 % endfor
+% endif
 % endfor

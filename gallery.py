@@ -104,13 +104,15 @@ def ex_from_test(path):
     with open(os.path.join(path, 'KCG/kcg_trace.xml')) as f:
         xml = f.read()
     b = {}
-    for fn in os.listdir(os.path.join(path, 'spec')):
-        (cat, base) = category(fn)
-        with open(os.path.join(path, 'spec', fn)) as f:
-            content = f.read()
-        if base not in b:
-            b[base] = {}
-        b[base][cat] = content
+    specdir = os.path.join(path, 'spec')
+    if os.path.isdir(specdir):
+        for fn in os.listdir(specdir):
+            (cat, base) = category(fn)
+            with open(os.path.join(specdir, fn)) as f:
+                content = f.read()
+            if base not in b:
+                b[base] = {}
+            b[base][cat] = content
     return Example(name, scade, xml, b)
 
 
