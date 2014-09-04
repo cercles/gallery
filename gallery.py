@@ -93,7 +93,14 @@ def category(s):
         return ('XML AST', s)
     assert False, "Unrecognized file: %s" % s
 
-Example = collections.namedtuple('Example', 'name scade xml b')
+Example = collections.namedtuple('Example', 'name scade xml b labels')
+
+
+def extract_labels(s):
+    """
+    Extract labels of the form "--@ XXXXX" in a string.
+    """
+    return [m[3:].strip() for m in re.findall('--@.*', s)]
 
 
 def ex_from_test(path):
@@ -101,6 +108,7 @@ def ex_from_test(path):
     name = g.group(1)
     with open(os.path.join(path, 'KCG/kcg_xml_filter_out.scade')) as f:
         scade = f.read()
+        labels = extract_labels(scade)
     with open(os.path.join(path, 'KCG/kcg_trace.xml')) as f:
         xml = f.read()
     b = {}
@@ -113,7 +121,7 @@ def ex_from_test(path):
             if base not in b:
                 b[base] = {}
             b[base][cat] = content
-    return Example(name, scade, xml, b)
+    return Example(name, scade, xml, b, labels)
 
 
 def pyg_ex(e, formatter):
@@ -123,17 +131,28 @@ def pyg_ex(e, formatter):
              {k: highlight(v, BLexer(), formatter) for k, v in bfile.items()
               } for fn, bfile in e.b.items()
              }
-    return Example(e.name, scade_pyg, xml_pyg, b_pyg)
+    return Example(e.name, scade_pyg, xml_pyg, b_pyg, e.labels)
 
 
 def quote_tex(s):
     return s.replace('_', '\\_')
 
 
-def render_list(l, template_name, formatter):
+def section_name(s):
+    return "sec:" + s.replace('_', '-')
+
+
+def render_list(l, labels, template_name, formatter):
     lookup = TemplateLookup(directories=['templates'])
     tpl = lookup.get_template(template_name)
-    out = tpl.render(exs=[pyg_ex(e, formatter) for e in l], quote_tex=quote_tex)
+    lbls = sorted(labels.items(), key=lambda t: t[0])
+    prepared_labels = [lbls[:35],
+                       lbls[35:]
+                       ]
+    out = tpl.render(exs=[pyg_ex(e, formatter) for e in l],
+                     quote_tex=quote_tex,
+                     section_name=section_name,
+                     labels=prepared_labels)
     return out.encode('utf8')
 
 
@@ -142,6 +161,12 @@ def main():
     test_paths = arguments['<testdir>']
     fmt = arguments['--format']
     l_ex = [ex_from_test(tp) for tp in test_paths]
+    labels = {}
+    for e in l_ex:
+        for l in e.labels:
+            if l not in labels:
+                labels[l] = []
+            labels[l].append(e.name)
     if not os.path.isdir('out'):
         os.mkdir('out')
     style_file = {'html': 'pygments.css',
@@ -154,7 +179,7 @@ def main():
            'latex': 'tex',
            }[fmt]
     with open('out/gallery.%s' % ext, 'w') as f:
-        f.write(render_list(l_ex, fmt+'.mako', formatcls()))
+        f.write(render_list(l_ex, labels, fmt+'.mako', formatcls()))
     with open('out/%s' % style_file, 'w') as f:
         f.write(formatcls(style='murphy').get_style_defs())
 
