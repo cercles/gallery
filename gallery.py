@@ -89,13 +89,15 @@ def category(s):
     if s.endswith('.mch'):
         base = re.sub(r'.mch$', '', s)
         return ('Abstract machine', base)
-    assert False
+    if s == 'ast_xml.txt':
+        return ('XML AST', s)
+    assert False, "Unrecognized file: %s" % s
 
 Example = collections.namedtuple('Example', 'name scade xml b')
 
 
 def ex_from_test(path):
-    g = re.search(r'/(\w+)\.test', path)
+    g = re.search(r'/(\w+)\.(test|fail)', path)
     name = g.group(1)
     with open(os.path.join(path, 'KCG/kcg_xml_filter_out.scade')) as f:
         scade = f.read()
@@ -122,10 +124,14 @@ def pyg_ex(e, formatter):
     return Example(e.name, scade_pyg, xml_pyg, b_pyg)
 
 
+def quote_tex(s):
+    return s.replace('_', '\\_')
+
+
 def render_list(l, template_name, formatter):
     lookup = TemplateLookup(directories=['templates'])
     tpl = lookup.get_template(template_name)
-    out = tpl.render(exs=[pyg_ex(e, formatter) for e in l])
+    out = tpl.render(exs=[pyg_ex(e, formatter) for e in l], quote_tex=quote_tex)
     return out.encode('utf8')
 
 

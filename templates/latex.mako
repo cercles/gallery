@@ -1,5 +1,5 @@
 % for ex in exs:
-\subsection{${ex.name}}
+\subsection{${quote_tex(ex.name)}}
 \subsubsection{Scade}
 
 ${ex.scade}
@@ -10,7 +10,7 @@ ${ex.xml}
 
 % for name, bfile in ex.b.items():
 % for k, v in sorted(bfile.items(), key=lambda t: t[0]):
-${name} -- ${k}:
+${quote_tex(name)} -- ${k}:
 
 ${v}
 % endfor
